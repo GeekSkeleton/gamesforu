@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -136,23 +135,33 @@ let recent=JSON.parse(localStorage.getItem("gfu-recent")||"[]");
 
 function saveFavorites(){localStorage.setItem("gfu-favorites",JSON.stringify(favorites))}
 function saveRecent(){localStorage.setItem("gfu-recent",JSON.stringify(recent))}
+
 function currentGame(){
  const id=new URLSearchParams(location.search).get("game");
  return games.find(g=>g.id===id);
 }
+
 function goHome(){
  history.pushState({},"",location.pathname);
- favoritesOnly=false;render();window.scrollTo(0,0);
+ favoritesOnly=false;
+ render();
+ window.scrollTo(0,0);
 }
+
 function openGame(id){
  history.pushState({},"","?game="+encodeURIComponent(id));
  recent=[id,...recent.filter(x=>x!==id)].slice(0,8);
- saveRecent();render();window.scrollTo(0,0);
+ saveRecent();
+ render();
+ window.scrollTo(0,0);
 }
+
 function toggleFavorite(id){
  favorites=favorites.includes(id)?favorites.filter(x=>x!==id):[...favorites,id];
- saveFavorites();render();
+ saveFavorites();
+ render();
 }
+
 function cardHTML(g){
  const isFav=favorites.includes(g.id);
  const status=g.id==="2048"?"PLAY NOW":"COMING SOON";
@@ -167,16 +176,21 @@ function cardHTML(g){
  <button class="favorite ${isFav?"on":""}" data-favorite="${g.id}" aria-label="Toggle favorite">${isFav?"♥":"♡"}</button>
  </article>`;
 }
+
 function renderGrid(){
- const grid=document.getElementById("gameGrid");if(!grid)return;
+ const grid=document.getElementById("gameGrid");
+ if(!grid)return;
+
  let list=games.filter(g=>
  (activeCategory==="All"||g.category===activeCategory)&&
  (g.name.toLowerCase().includes(searchTerm)||g.description.toLowerCase().includes(searchTerm))&&
  (!favoritesOnly||favorites.includes(g.id))
  );
+
  grid.innerHTML=list.length?list.map(cardHTML).join(""):`<div class="empty glass">No games found. Try another search!</div>`;
  document.getElementById("gameCount").textContent=`${list.length} games`;
 }
+
 function renderHome(){
  app.innerHTML=`
  <section class="hero glass">
@@ -187,32 +201,51 @@ function renderHome(){
  <input id="searchInput" type="search" placeholder="🔍 Search games..." value="${searchTerm.replace(/"/g,"&quot;")}">
  <button class="primary-btn" id="randomBtn">🎲 Random</button>
  </div></section>
+
  <div class="section-head"><h2>${favoritesOnly?"Your favorites":"Explore games"}</h2><span class="muted" id="gameCount"></span></div>
+
  <div class="categories" id="categories">
  ${["All","Puzzle","Arcade","Sports","Racing","Strategy","Creative","Adventure","Other"].map(c=>`<button class="chip ${activeCategory===c?"active":""}" data-category="${c}">${c}</button>`).join("")}
  </div>
+
  <section class="grid" id="gameGrid"></section>
+
  ${!favoritesOnly&&recent.length?`<div class="section-head"><h2>Recently viewed</h2></div><section class="grid">${recent.map(id=>games.find(g=>g.id===id)).filter(Boolean).map(cardHTML).join("")}</section>`:""}
  `;
- document.getElementById("searchInput").addEventListener("input",e=>{searchTerm=e.target.value.toLowerCase().trim();renderGrid()});
+
+ document.getElementById("searchInput").addEventListener("input",e=>{
+  searchTerm=e.target.value.toLowerCase().trim();
+  renderGrid();
+ });
+
  document.getElementById("randomBtn").addEventListener("click",()=>{
- const visible=games.filter(g=>(activeCategory==="All"||g.category===activeCategory)&&(!favoritesOnly||favorites.includes(g.id))&&(g.name.toLowerCase().includes(searchTerm)||g.description.toLowerCase().includes(searchTerm)));
- const pool=visible.length?visible:games;
- openGame(pool[Math.floor(Math.random()*pool.length)].id);
+  const visible=games.filter(g=>
+   (activeCategory==="All"||g.category===activeCategory)&&
+   (!favoritesOnly||favorites.includes(g.id))&&
+   (g.name.toLowerCase().includes(searchTerm)||g.description.toLowerCase().includes(searchTerm))
+  );
+  const pool=visible.length?visible:games;
+  openGame(pool[Math.floor(Math.random()*pool.length)].id);
  });
+
  document.getElementById("categories").addEventListener("click",e=>{
- const btn=e.target.closest("[data-category]");if(!btn)return;
- activeCategory=btn.dataset.category;
- document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===btn));
- renderGrid();
+  const btn=e.target.closest("[data-category]");
+  if(!btn)return;
+  activeCategory=btn.dataset.category;
+  document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===btn));
+  renderGrid();
  });
+
  renderGrid();
 }
+
 function renderDetail(g){
  const related=games.filter(x=>x.category===g.category&&x.id!==g.id).slice(0,4);
  const playable=g.id==="2048";
+
  app.innerHTML=`
  <button class="secondary-btn back-btn" id="backBtn">← Back to games</button>
+
  <section class="detail-hero glass">
  <div class="detail-art">${g.emoji}</div>
  <div class="detail-info">
@@ -222,40 +255,70 @@ function renderDetail(g){
  <button class="primary-btn" id="playBtn">${playable?"▶ Play now":"▶ Coming soon"}</button>
  <button class="secondary-btn" id="detailFavorite">${favorites.includes(g.id)?"♥ Saved":"♡ Add to favorites"}</button>
  </div></div></section>
+
  ${playable?"":`
- <section class="play-panel glass"><div class="play-placeholder"><div>
+ <section class="play-panel glass">
+ <div class="play-placeholder"><div>
  <div class="big">${g.emoji}</div><h2>Coming soon!</h2>
  <p>We're working on bringing ${g.name} to GamesforU.</p>
  <p>Check back later to play directly on this page.</p>
  </div></div></section>`}
+
  ${related.length?`<div class="section-head"><h2>More ${g.category} games</h2></div><section class="grid">${related.map(cardHTML).join("")}</section>`:""}
  `;
+
  document.getElementById("backBtn").addEventListener("click",goHome);
+
  document.getElementById("playBtn").addEventListener("click",()=>{
- if(playable)location.href="2048.html";
- else alert("This game isn't connected yet. It's coming soon!");
+  if(playable)location.href="2048.html/game.html";
+  else alert("This game isn't connected yet. It's coming soon!");
  });
+
  document.getElementById("detailFavorite").addEventListener("click",()=>toggleFavorite(g.id));
 }
-function render(){const g=currentGame();if(g)renderDetail(g);else renderHome()}
+
+function render(){
+ const g=currentGame();
+ if(g)renderDetail(g);
+ else renderHome();
+}
+
 document.addEventListener("click",e=>{
  const favorite=e.target.closest("[data-favorite]");
- if(favorite){e.preventDefault();e.stopPropagation();toggleFavorite(favorite.dataset.favorite);return}
+ if(favorite){
+  e.preventDefault();
+  e.stopPropagation();
+  toggleFavorite(favorite.dataset.favorite);
+  return;
+ }
+
  const gameLink=e.target.closest("[data-game]");
- if(gameLink){e.preventDefault();openGame(gameLink.dataset.game)}
+ if(gameLink){
+  e.preventDefault();
+  openGame(gameLink.dataset.game);
+ }
 });
+
 document.getElementById("favoritesBtn").addEventListener("click",()=>{
- favoritesOnly=!favoritesOnly;activeCategory="All";searchTerm="";render();window.scrollTo(0,0);
+ favoritesOnly=!favoritesOnly;
+ activeCategory="All";
+ searchTerm="";
+ render();
+ window.scrollTo(0,0);
 });
+
 document.getElementById("themeBtn").addEventListener("click",()=>{
  document.body.classList.toggle("light");
  const light=document.body.classList.contains("light");
  localStorage.setItem("gfu-theme",light?"light":"dark");
  document.getElementById("themeBtn").textContent=light?"🌙":"☀️";
 });
+
 if(localStorage.getItem("gfu-theme")==="light"){
- document.body.classList.add("light");document.getElementById("themeBtn").textContent="🌙";
+ document.body.classList.add("light");
+ document.getElementById("themeBtn").textContent="🌙";
 }
+
 window.addEventListener("popstate",render);
 render();
 </script>
