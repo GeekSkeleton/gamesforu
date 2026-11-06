@@ -1,450 +1,275 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#101b46">
-<title>GamesforU — Play something awesome</title>
+<title>2048 | GamesforU</title>
 <style>
-:root {
-  --bg:#09132f;
-  --surface:rgba(25,43,91,.66);
-  --surface2:rgba(45,68,128,.38);
-  --text:#f5f7ff;
-  --muted:#aebce0;
-  --accent:#78aaff;
-  --accent2:#b6d5ff;
-  --border:rgba(190,210,255,.16);
-  --shadow:0 15px 45px rgba(0,0,0,.22);
-}
-body.light {
-  --bg:#eaf1ff;
-  --surface:rgba(255,255,255,.72);
-  --surface2:rgba(220,232,255,.7);
-  --text:#17264d;
-  --muted:#617197;
-  --accent:#2868d9;
-  --accent2:#477fe0;
-  --border:rgba(70,100,160,.17);
-  --shadow:0 15px 45px rgba(45,70,120,.12);
-}
 *{box-sizing:border-box}
-body {
-  margin:0;
-  min-height:100vh;
-  color:var(--text);
-  background:
-    radial-gradient(ellipse at 15% 0%,rgba(51,100,210,.25),transparent 38%),
-    radial-gradient(ellipse at 90% 35%,rgba(62,75,180,.18),transparent 35%),
-    var(--bg);
-  font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;
-  transition:background .25s,color .25s;
+body{
+  margin:0;min-height:100vh;padding:20px;
+  font-family:Arial,sans-serif;color:#fff;
+  background:radial-gradient(circle at top,#173b75,#07152e 70%);
+  display:flex;justify-content:center;align-items:center;
 }
-button,input{font:inherit}
-button{cursor:pointer}
-a{color:inherit;text-decoration:none}
-.shell{width:min(1180px,92%);margin:auto}
-.glass{
-  background:var(--surface);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(18px);
-  -webkit-backdrop-filter:blur(18px);
+.game{width:100%;max-width:480px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+a{color:#9dcaff;text-decoration:none;font-weight:bold}
+h1{font-size:42px;margin:10px 0}
+.subtitle{color:#a9bddb;font-size:14px}
+.top{display:flex;gap:10px;align-items:center}
+.scorebox{
+  background:#18345d;border:1px solid #41628d;
+  border-radius:12px;padding:9px 16px;text-align:center;min-width:85px
 }
-header{
-  position:sticky;top:0;z-index:10;
-  background:rgba(8,17,46,.65);
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(20px);
+.scorebox small{display:block;color:#b9cce6;font-size:11px}
+.scorebox strong{font-size:21px}
+.buttons{display:flex;gap:10px;margin:18px 0}
+button{
+  border:0;border-radius:10px;padding:12px 16px;
+  background:#327de0;color:white;font-weight:bold;font-size:14px;
+  cursor:pointer;flex:1
 }
-body.light header{background:rgba(235,242,255,.78)}
-.nav{
-  min-height:76px;display:flex;align-items:center;
-  justify-content:space-between;gap:16px;
+button.secondary{background:#25456f}
+button:disabled{opacity:.4;cursor:not-allowed}
+#message{min-height:22px;color:#b9cce6;font-size:14px;margin-bottom:10px}
+.board{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:9px;
+  background:#142b4c;border:1px solid #31547e;
+  padding:10px;border-radius:15px;touch-action:none;
 }
-.logo{font-size:25px;font-weight:900;letter-spacing:-1px}
-.logo span{color:var(--accent)}
-.nav-actions{display:flex;gap:9px;align-items:center}
-.icon-btn,.secondary-btn,.primary-btn{
-  border:1px solid var(--border);border-radius:13px;
-  padding:10px 14px;color:var(--text);
-  background:var(--surface2);
+.cell{
+  aspect-ratio:1;border-radius:9px;background:#29415f;
+  display:flex;justify-content:center;align-items:center;
+  font-size:clamp(22px,7vw,34px);font-weight:800;color:#fff;
 }
-.icon-btn{font-size:18px}
-.primary-btn{
-  background:linear-gradient(135deg,#3977e9,#75aaff);
-  color:white;border:0;font-weight:800;
-}
-main{padding:34px 0 70px}
-.hero{
-  padding:44px;border-radius:27px;overflow:hidden;
-  position:relative;margin-bottom:30px;
-}
-.hero:after{
-  content:"🎮";position:absolute;right:7%;top:15%;
-  font-size:clamp(70px,12vw,145px);opacity:.18;
-  transform:rotate(-13deg);pointer-events:none;
-}
-.eyebrow{
-  color:var(--accent2);font-weight:800;
-  letter-spacing:2px;text-transform:uppercase;font-size:12px;
-}
-h1{font-size:clamp(38px,7vw,65px);line-height:1.02;
-  letter-spacing:-2.5px;margin:13px 0}
-.hero p{color:var(--muted);font-size:17px;max-width:520px}
-.search-wrap{display:flex;gap:10px;max-width:650px;margin-top:25px}
-.search-wrap input{
-  min-width:0;flex:1;padding:15px 18px;
-  border-radius:14px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--text);outline:none;
-}
-.search-wrap input:focus{border-color:var(--accent)}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin:30px 0 16px;flex-wrap:wrap;
-}
-.section-head h2{font-size:23px;margin:0;letter-spacing:-.5px}
-.muted{color:var(--muted)}
-.categories{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:22px}
-.chip{
-  border:1px solid var(--border);background:var(--surface);
-  color:var(--muted);padding:9px 14px;border-radius:999px;
-  font-size:13px;font-weight:700;
-}
-.chip.active{background:var(--accent);color:white;border-color:transparent}
-.grid{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;
-}
-.game-card{
-  min-width:0;position:relative;border-radius:19px;
-  overflow:hidden;transition:transform .2s,border-color .2s;
-}
-.game-card:hover{transform:translateY(-5px);border-color:var(--accent)}
-.game-link{display:block;padding:16px}
-.game-art{
-  height:125px;border-radius:14px;
-  display:grid;place-items:center;font-size:58px;
-  background:linear-gradient(135deg,rgba(86,132,231,.28),rgba(155,187,255,.08));
-  border:1px solid var(--border);margin-bottom:13px;
-}
-.game-card h3{font-size:16px;margin:0 0 6px}
-.game-card p{
-  font-size:12px;color:var(--muted);line-height:1.5;
-  margin:0;min-height:36px;
-}
-.card-bottom{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:6px;margin-top:13px;
-}
-.status{
-  font-size:10px;letter-spacing:.6px;font-weight:900;
-  color:var(--accent2);background:var(--surface2);
-  border:1px solid var(--border);padding:6px 8px;border-radius:7px;
-}
-.favorite{
-  width:34px;height:34px;border-radius:10px;
-  border:1px solid var(--border);background:var(--surface2);
-  color:var(--text);font-size:17px;
-}
-.favorite.on{color:#ff769c}
-.empty{
-  padding:35px;text-align:center;border-radius:18px;
-  color:var(--muted);grid-column:1/-1;
-}
-footer{
-  border-top:1px solid var(--border);
-  color:var(--muted);padding:25px 0;text-align:center;font-size:13px;
-}
-/* Individual game page */
-.back-btn{margin-bottom:22px}
-.detail-hero{
-  border-radius:25px;padding:30px;
-  display:grid;grid-template-columns: minmax(180px, .8fr) 1.5fr;
-  gap:30px;align-items:center;
-}
-.detail-art{
-  min-height:240px;border-radius:20px;
-  display:grid;place-items:center;font-size:100px;
-  background:linear-gradient(135deg,rgba(86,132,231,.3),rgba(155,187,255,.08));
-  border:1px solid var(--border);
-}
-.detail-info h1{font-size:clamp(32px,5vw,52px);margin:10px 0}
-.detail-info p{color:var(--muted);line-height:1.8;font-size:16px}
-.detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.play-panel{
-  border-radius:20px;padding:25px;margin-top:22px;text-align:center;
-}
-.play-placeholder{
-  min-height:210px;border-radius:15px;
-  background:var(--surface2);display:grid;place-items:center;
-  padding:25px;
-}
-.play-placeholder .big{font-size:45px}
-.play-placeholder h2{margin:8px 0}
-.play-placeholder p{color:var(--muted);margin:5px 0}
-.detail-label{
-  display:inline-block;background:var(--surface2);
-  border:1px solid var(--border);padding:7px 11px;
-  border-radius:99px;color:var(--muted);font-size:12px;
-}
-@media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:650px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-  .hero{padding:28px 22px}
-  .hero:after{right:2%;top:5%;font-size:75px}
-  .game-link{padding:11px}
-  .game-art{height:105px;font-size:48px}
-  .game-card h3{font-size:14px}
-  .detail-hero{grid-template-columns:1fr;padding:18px;gap:20px}
-  .detail-art{min-height:170px;font-size:75px}
-  .nav{min-height:66px}
-  .logo{font-size:22px}
-  .icon-btn{padding:9px 11px}
-  main{padding-top:22px}
-}
+.v2{background:#dceaff;color:#19365d}
+.v4{background:#b9d9ff;color:#19365d}
+.v8{background:#76b5ff}
+.v16{background:#4c94f0}
+.v32{background:#3275d0}
+.v64{background:#245bb0}
+.v128{background:#e9c85d;color:#27334b;font-size:clamp(19px,6vw,29px)}
+.v256{background:#e9b94b;color:#27334b;font-size:clamp(19px,6vw,29px)}
+.v512{background:#edaa37;color:#27334b;font-size:clamp(19px,6vw,29px)}
+.v1024,.v2048,.vbig{background:#f08b35;color:#fff;font-size:clamp(16px,5vw,25px)}
+.instructions{color:#a9bddb;font-size:13px;line-height:1.6;margin-top:18px}
+@media(max-width:380px){body{padding:12px}.board{gap:6px;padding:7px}.cell{border-radius:7px}}
 </style>
 </head>
 <body>
-<header>
-  <div class="shell nav">
-    <a class="logo" href="./">Games<span>forU</span></a>
-    <div class="nav-actions">
-      <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">☀️</button>
-      <button class="secondary-btn" id="favoritesBtn">♡ Favorites</button>
+<main class="game">
+  <header>
+    <div>
+      <a href="./">← GamesforU</a>
+      <h1>2048</h1>
+      <div class="subtitle">Join the tiles and reach 2048!</div>
     </div>
+    <div class="top">
+      <div class="scorebox"><small>SCORE</small><strong id="score">0</strong></div>
+      <div class="scorebox"><small>BEST</small><strong id="best">0</strong></div>
+    </div>
+  </header>
+
+  <div class="buttons">
+    <button onclick="newGame()">New Game</button>
+    <button class="secondary" id="undo" onclick="undoMove()" disabled>↶ Undo</button>
   </div>
-</header>
 
-<main class="shell" id="app"></main>
+  <div id="message">Use the arrow keys or swipe to move the tiles.</div>
+  <div class="board" id="board"></div>
 
-<footer>
-  <div class="shell">GamesforU · Play something awesome.</div>
-</footer>
+  <div class="instructions">
+    <b>How to play:</b> Swipe in any direction on your phone, or use your keyboard arrow keys. Matching numbers combine when they touch. Reach 2048 to win!
+  </div>
+</main>
 
 <script>
-const games = [
- {id:"2048",name:"2048",emoji:"🔢",category:"Puzzle",description:"Slide numbered tiles across a grid and combine matching numbers to create the ultimate 2048 tile!"},
- {id:"chrome-dino",name:"Chrome Running Dino",emoji:"🦖",category:"Arcade",description:"Run endlessly and dodge obstacles like cacti and pterodactyls. How high can you score?"},
- {id:"hextris",name:"Hextris",emoji:"⬡",category:"Puzzle",description:"An addictive puzzle game inspired by Tetris, but with hexagons!"},
- {id:"fireboy-watergirl",name:"Fireboy and Watergirl",emoji:"🔥",category:"Puzzle",description:"Cooperate with your partner to complete challenging levels as Fireboy and Watergirl!"},
- {id:"pitch-duel",name:"Pitch Duel",emoji:"⚽",category:"Sports",description:"Play against your friends or a bot in a two-sided, 2D game that's twice as much fun!"},
- {id:"noname-soccer",name:"Noname Soccer",emoji:"🥅",category:"Sports",description:"A 3D soccer game with gameplay and physics as realistic as it gets!"},
- {id:"momentum-world-cup",name:"Momentum World Cup",emoji:"🏆",category:"Sports",description:"Throw discs and give them the right momentum to get the ball into the net!"},
- {id:"basket-random",name:"Basket Random",emoji:"🏀",category:"Sports",description:"Jump, flap and do all sorts of random things to get the ball in the basket while moving like a sardine!"},
- {id:"random-football",name:"Random Football",emoji:"⚽",category:"Sports",description:"Jump, shoot and do all sorts of random things to get the ball into the net while moving like a sardine!"},
- {id:"volley-random",name:"Volley Random",emoji:"🏐",category:"Sports",description:"Jump, spike and do all sorts of random things to get the ball onto the other side of the net while moving like a sardine!"},
- {id:"moto-x3m",name:"Moto X3M",emoji:"🏍️",category:"Racing",description:"The craziest motorcycle adventure you'll ever experience! Complete all the levels of this wild ride and make it to the finish line!"},
- {id:"polytrack",name:"PolyTrack",emoji:"🏎️",category:"Racing",description:"An extreme racing game with intense and unusual physics that would leave even Max Verstappen confused!"},
- {id:"wordle",name:"Wordle",emoji:"🔤",category:"Puzzle",description:"A daily and unlimited word-guessing game. Can you guess the five-letter word in just six tries?"},
- {id:"subway-surfers",name:"Subway Surfers",emoji:"🚆",category:"Arcade",description:"Run endlessly through a 3D world while a police officer chases you! Dodge trains, jump over obstacles and test your reflexes."},
- {id:"paper-io",name:"Paper.io",emoji:"🟦",category:"Strategy",description:"Conquer the board and leave your mark! Capture territory by drawing loops and outsmarting your opponents."},
- {id:"hole-io",name:"Hole.io",emoji:"🕳️",category:"Arcade",description:"A crazy game where you have to swallow the entire world. Will everything fit inside your hole? Play and find out!"},
- {id:"snake-io",name:"Snake.io",emoji:"🐍",category:"Arcade",description:"The game of 2016! Eat dots, grow bigger and become the biggest snake around!"},
- {id:"block-blast",name:"Block Blast",emoji:"🧩",category:"Puzzle",description:"One of the most addictive puzzle games around! Pure brainrot and Tetris slop. Place blocks strategically and create satisfying streaks!"},
- {id:"chess",name:"Chess",emoji:"♟️",category:"Strategy",description:"The classic game of strategy. Challenge your mind, outsmart your opponent and checkmate!"},
- {id:"conquer-the-world",name:"Conquer the World",emoji:"🌍",category:"Strategy",description:"Play a classic game of Risk! Expand your territory, build your empire and conquer the world."},
- {id:"jelly-fruit-merger",name:"Jelly Fruit Merger",emoji:"🍉",category:"Puzzle",description:"Merge fruits to create the biggest fruit possible! But be careful: if too many fruits pile up, you could lose!"},
- {id:"weebpaint",name:"WeebPaint",emoji:"🎨",category:"Creative",description:"Get creative, grab your digital brush and show off your drawing skills!"},
- {id:"down-golf",name:"Down Golf",emoji:"⛳",category:"Sports",description:"A quirky golf adventure. Aim carefully, make your shots and work your way through the courses!"},
- {id:"geometry-dash",name:"Geometry Dash",emoji:"🔺",category:"Arcade",description:"Jump to the rhythm and dodge spikes, blocks and countless other obstacles. Can you make it to the end?"},
- {id:"minecraftforu",name:"MinecraftforU",emoji:"⛏️",category:"Adventure",description:"The best-selling game in history inspired our own version of this crazy blocky survival adventure!"},
- {id:"click-speed-test",name:"Click Speed Test",emoji:"🖱️",category:"Other",description:"Tap as fast as you can! How many clicks can you get?"}
-];
+const SIZE=4;
+let grid,score,best,previous=null,won=false,over=false;
+const board=document.getElementById("board");
+const scoreEl=document.getElementById("score");
+const bestEl=document.getElementById("best");
+const undoBtn=document.getElementById("undo");
+const message=document.getElementById("message");
 
-const app = document.getElementById("app");
-let activeCategory = "All";
-let favoritesOnly = false;
-let searchTerm = "";
-let favorites = JSON.parse(localStorage.getItem("gfu-favorites") || "[]");
-let recent = JSON.parse(localStorage.getItem("gfu-recent") || "[]");
+best=Number(localStorage.getItem("gamesforu2048best")||0);
 
-function saveFavorites(){
-  localStorage.setItem("gfu-favorites",JSON.stringify(favorites));
+function emptyGrid(){
+  return Array.from({length:SIZE},()=>Array(SIZE).fill(0));
 }
-function saveRecent(){
-  localStorage.setItem("gfu-recent",JSON.stringify(recent));
+
+function addTile(){
+  const empty=[];
+  for(let r=0;r<SIZE;r++)
+    for(let c=0;c<SIZE;c++)
+      if(grid[r][c]===0)empty.push([r,c]);
+
+  if(!empty.length)return;
+  const [r,c]=empty[Math.floor(Math.random()*empty.length)];
+  grid[r][c]=Math.random()<0.9?2:4;
 }
-function currentGame(){
-  const id = new URLSearchParams(location.search).get("game");
-  return games.find(g=>g.id===id);
-}
-function goHome(){
-  history.pushState({}, "", location.pathname);
-  favoritesOnly = false;
-  render();
-  window.scrollTo(0,0);
-}
-function openGame(id){
-  history.pushState({}, "", "?game="+encodeURIComponent(id));
-  recent = [id,...recent.filter(x=>x!==id)].slice(0,8);
-  saveRecent();
-  render();
-  window.scrollTo(0,0);
-}
-function toggleFavorite(id){
-  favorites = favorites.includes(id)
-    ? favorites.filter(x=>x!==id)
-    : [...favorites,id];
-  saveFavorites();
-  render();
-}
-function cardHTML(g){
-  const isFav = favorites.includes(g.id);
-  return `
-    <article class="game-card glass">
-      <a class="game-link" href="?game=${encodeURIComponent(g.id)}" data-game="${g.id}">
-        <div class="game-art">${g.emoji}</div>
-        <h3>${g.name}</h3>
-        <p>${g.description}</p>
-        <div class="card-bottom">
-          <span class="status">COMING SOON</span>
-          <span class="muted">View game →</span>
-        </div>
-      </a>
-      <button class="favorite ${isFav?"on":""}" data-favorite="${g.id}" aria-label="Toggle favorite">
-        ${isFav?"♥":"♡"}
-      </button>
-    </article>`;
-}
-function renderGrid(){
-  const grid = document.getElementById("gameGrid");
-  if(!grid) return;
-  let list = games.filter(g=>{
-    const matchesCategory = activeCategory==="All" || g.category===activeCategory;
-    const matchesSearch = g.name.toLowerCase().includes(searchTerm) ||
-      g.description.toLowerCase().includes(searchTerm);
-    const matchesFavorite = !favoritesOnly || favorites.includes(g.id);
-    return matchesCategory && matchesSearch && matchesFavorite;
-  });
-  grid.innerHTML = list.length
-    ? list.map(cardHTML).join("")
-    : `<div class="empty glass">No games found. Try another search!</div>`;
-  const count = document.getElementById("gameCount");
-  if(count) count.textContent = `${list.length} games`;
-}
-function renderHome(){
-  app.innerHTML = `
-    <section class="hero glass">
-      <div class="eyebrow">Welcome to GamesforU</div>
-      <h1>Play something<br>awesome.</h1>
-      <p>Your place for fun browser games. Find your next favorite game and jump right in.</p>
-      <div class="search-wrap">
-        <input id="searchInput" type="search" placeholder="🔍 Search games..." value="${searchTerm.replace(/"/g,"&quot;")}">
-        <button class="primary-btn" id="randomBtn">🎲 Random</button>
-      </div>
-    </section>
-    <div class="section-head">
-      <h2>${favoritesOnly?"Your favorites":"Explore games"}</h2>
-      <span class="muted" id="gameCount"></span>
-    </div>
-    <div class="categories" id="categories">
-      ${["All","Puzzle","Arcade","Sports","Racing","Strategy","Creative","Adventure","Other"].map(c=>
-        `<button class="chip ${activeCategory===c?"active":""}" data-category="${c}">${c}</button>`
-      ).join("")}
-    </div>
-    <section class="grid" id="gameGrid"></section>
-    ${!favoritesOnly && recent.length ? `
-      <div class="section-head"><h2>Recently viewed</h2></div>
-      <section class="grid">${recent.map(id=>games.find(g=>g.id===id)).filter(Boolean).map(cardHTML).join("")}</section>
-    `:""}
-  `;
-  document.getElementById("searchInput").addEventListener("input",e=>{
-    searchTerm=e.target.value.toLowerCase().trim();
-    renderGrid();
-  });
-  document.getElementById("randomBtn").addEventListener("click",()=>{
-    const visible = games.filter(g=>
-      (activeCategory==="All"||g.category===activeCategory) &&
-      (!favoritesOnly||favorites.includes(g.id)) &&
-      (g.name.toLowerCase().includes(searchTerm)||g.description.toLowerCase().includes(searchTerm))
-    );
-    const pool = visible.length ? visible : games;
-    openGame(pool[Math.floor(Math.random()*pool.length)].id);
-  });
-  document.getElementById("categories").addEventListener("click",e=>{
-    const btn=e.target.closest("[data-category]");
-    if(!btn)return;
-    activeCategory=btn.dataset.category;
-    document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("active",c===btn));
-    renderGrid();
-  });
-  renderGrid();
-}
-function renderDetail(g){
-  const related = games.filter(x=>x.category===g.category && x.id!==g.id).slice(0,4);
-  app.innerHTML = `
-    <button class="secondary-btn back-btn" id="backBtn">← Back to games</button>
-    <section class="detail-hero glass">
-      <div class="detail-art">${g.emoji}</div>
-      <div class="detail-info">
-        <span class="detail-label">${g.category}</span>
-        <h1>${g.name}</h1>
-        <p>${g.description}</p>
-        <div class="detail-actions">
-          <button class="primary-btn" id="playBtn">▶ Play game</button>
-          <button class="secondary-btn" id="detailFavorite">${favorites.includes(g.id)?"♥ Saved":"♡ Add to favorites"}</button>
-        </div>
-      </div>
-    </section>
-    <section class="play-panel glass">
-      <div class="play-placeholder">
-        <div>
-          <div class="big">${g.emoji}</div>
-          <h2>Coming soon!</h2>
-          <p>We're working on bringing ${g.name} to GamesforU.</p>
-          <p>Check back later to play directly on this page.</p>
-        </div>
-      </div>
-    </section>
-    ${related.length?`
-      <div class="section-head"><h2>More ${g.category} games</h2></div>
-      <section class="grid">${related.map(cardHTML).join("")}</section>
-    `:""}
-  `;
-  document.getElementById("backBtn").addEventListener("click",goHome);
-  document.getElementById("playBtn").addEventListener("click",()=>{
-    alert("This game isn't connected yet. It's coming soon!");
-  });
-  document.getElementById("detailFavorite").addEventListener("click",()=>toggleFavorite(g.id));
-}
+
 function render(){
-  const g=currentGame();
-  if(g) renderDetail(g);
-  else renderHome();
+  board.innerHTML="";
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      const value=grid[r][c];
+      const cell=document.createElement("div");
+      cell.className="cell";
+      if(value){
+        cell.textContent=value;
+        cell.classList.add(value<=2048?"v"+value:"vbig");
+      }
+      board.appendChild(cell);
+    }
+  }
+  scoreEl.textContent=score;
+  bestEl.textContent=best;
+  undoBtn.disabled=!previous;
 }
-document.addEventListener("click",e=>{
-  const favorite=e.target.closest("[data-favorite]");
-  if(favorite){
-    e.preventDefault();
-    e.stopPropagation();
-    toggleFavorite(favorite.dataset.favorite);
-    return;
-  }
-  const gameLink=e.target.closest("[data-game]");
-  if(gameLink){
-    e.preventDefault();
-    openGame(gameLink.dataset.game);
-  }
-});
-document.getElementById("favoritesBtn").addEventListener("click",()=>{
-  favoritesOnly=!favoritesOnly;
-  activeCategory="All";
-  searchTerm="";
+
+function newGame(){
+  grid=emptyGrid();
+  score=0;
+  previous=null;
+  won=false;
+  over=false;
+  addTile();
+  addTile();
+  message.textContent="Use the arrow keys or swipe to move the tiles.";
   render();
-  window.scrollTo(0,0);
-});
-document.getElementById("themeBtn").addEventListener("click",()=>{
-  document.body.classList.toggle("light");
-  const light=document.body.classList.contains("light");
-  localStorage.setItem("gfu-theme",light?"light":"dark");
-  document.getElementById("themeBtn").textContent=light?"🌙":"☀️";
-});
-if(localStorage.getItem("gfu-theme")==="light"){
-  document.body.classList.add("light");
-  document.getElementById("themeBtn").textContent="🌙";
 }
-window.addEventListener("popstate",render);
-render();
+
+function saveUndo(){
+  previous={
+    grid:grid.map(row=>row.slice()),
+    score,
+    won,
+    over
+  };
+}
+
+function undoMove(){
+  if(!previous)return;
+  grid=previous.grid.map(row=>row.slice());
+  score=previous.score;
+  won=previous.won;
+  over=previous.over;
+  previous=null;
+  message.textContent="Move undone.";
+  render();
+}
+
+function slide(row){
+  let arr=row.filter(v=>v!==0);
+  for(let i=0;i<arr.length-1;i++){
+    if(arr[i]===arr[i+1]){
+      arr[i]*=2;
+      score+=arr[i];
+      arr.splice(i+1,1);
+      if(arr[i]===2048&&!won){
+        won=true;
+        message.textContent="🎉 You reached 2048! Keep playing!";
+      }
+    }
+  }
+  while(arr.length<SIZE)arr.push(0);
+  return arr;
+}
+
+function move(direction){
+  if(over)return;
+
+  const old=grid.map(row=>row.slice());
+  const oldScore=score;
+  let next=emptyGrid();
+
+  if(direction==="left"||direction==="right"){
+    for(let r=0;r<SIZE;r++){
+      let row=grid[r].slice();
+      if(direction==="right")row.reverse();
+      row=slide(row);
+      if(direction==="right")row.reverse();
+      next[r]=row;
+    }
+  }else{
+    for(let c=0;c<SIZE;c++){
+      let col=[];
+      for(let r=0;r<SIZE;r++)col.push(grid[r][c]);
+      if(direction==="down")col.reverse();
+      col=slide(col);
+      if(direction==="down")col.reverse();
+      for(let r=0;r<SIZE;r++)next[r][c]=col[r];
+    }
+  }
+
+  const changed=JSON.stringify(old)!==JSON.stringify(next);
+  if(!changed){score=oldScore;return;}
+
+  saveUndo();
+  grid=next;
+  addTile();
+
+  if(score>best){
+    best=score;
+    localStorage.setItem("gamesforu2048best",best);
+  }
+
+  render();
+
+  if(!won)message.textContent="Nice move! Keep going.";
+  if(!canMove()){
+    over=true;
+    message.textContent="Game over! Start a new game to play again.";
+  }
+}
+
+function canMove(){
+  for(let r=0;r<SIZE;r++){
+    for(let c=0;c<SIZE;c++){
+      if(grid[r][c]===0)return true;
+      if(c< SIZE-1&&grid[r][c]===grid[r][c+1])return true;
+      if(r< SIZE-1&&grid[r][c]===grid[r+1][c])return true;
+    }
+  }
+  return false;
+}
+
+document.addEventListener("keydown",e=>{
+  const keys={
+    ArrowLeft:"left",
+    ArrowRight:"right",
+    ArrowUp:"up",
+    ArrowDown:"down"
+  };
+  if(keys[e.key]){
+    e.preventDefault();
+    move(keys[e.key]);
+  }
+});
+
+let startX=0,startY=0;
+board.addEventListener("touchstart",e=>{
+  const t=e.changedTouches[0];
+  startX=t.clientX;
+  startY=t.clientY;
+},{passive:true});
+
+board.addEventListener("touchend",e=>{
+  const t=e.changedTouches[0];
+  const dx=t.clientX-startX;
+  const dy=t.clientY-startY;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<25)return;
+  if(Math.abs(dx)>Math.abs(dy)){
+    move(dx>0?"right":"left");
+  }else{
+    move(dy>0?"down":"up");
+  }
+},{passive:true});
+
+newGame();
 </script>
 </body>
 </html>
