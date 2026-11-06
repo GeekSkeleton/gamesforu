@@ -1,12 +1,436 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GamesforU</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#091735">
+<title>GamesforU — Play Something Awesome</title>
+<style>
+:root {
+  --bg:#07132b;
+  --surface:rgba(255,255,255,.075);
+  --surface2:rgba(255,255,255,.12);
+  --border:rgba(255,255,255,.14);
+  --text:#f4f7ff;
+  --muted:#a9bad9;
+  --blue:#477cff;
+  --blue2:#254fc0;
+  --shadow:0 12px 40px rgba(0,0,0,.22);
+}
+body.light {
+  --bg:#eaf1ff;
+  --surface:rgba(255,255,255,.62);
+  --surface2:rgba(255,255,255,.86);
+  --border:rgba(47,83,155,.16);
+  --text:#10244a;
+  --muted:#60769d;
+  --shadow:0 12px 40px rgba(42,75,140,.12);
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  font-family:Inter,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(42,100,255,.24),transparent 42%),
+    radial-gradient(ellipse at 90% 25%,rgba(90,75,220,.17),transparent 38%),
+    var(--bg);
+  background-attachment:fixed;
+  min-height:100vh;
+  transition:background .3s,color .3s;
+}
+button,input {font:inherit}
+button {cursor:pointer;color:inherit}
+.glass {
+  background:var(--surface);
+  border:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:var(--shadow);
+}
+header {
+  position:sticky;top:0;z-index:10;
+  padding:14px 5%;
+  background:rgba(7,19,43,.72);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(22px);
+}
+body.light header {background:rgba(234,241,255,.8)}
+.nav {
+  max-width:1250px;margin:auto;
+  display:flex;align-items:center;gap:22px;
+}
+.logo {
+  display:flex;align-items:center;gap:10px;
+  font-size:23px;font-weight:850;letter-spacing:-1px;
+  white-space:nowrap;
+}
+.logo-icon {
+  width:39px;height:39px;border-radius:13px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#69a0ff,#354bd8);
+  box-shadow:0 5px 20px #315fe955;
+  font-size:22px;
+}
+.nav-links {display:flex;gap:22px;margin-left:auto}
+.nav-links a {
+  color:var(--muted);text-decoration:none;font-size:14px;
+  font-weight:650;transition:.2s;
+}
+.nav-links a:hover {color:var(--text)}
+.icon-btn {
+  width:42px;height:42px;border-radius:14px;
+  border:1px solid var(--border);background:var(--surface);
+  font-size:18px;
+}
+main {max-width:1250px;margin:auto;padding:30px 5% 70px}
+.hero {
+  border-radius:27px;padding:42px;
+  position:relative;overflow:hidden;
+  background:linear-gradient(115deg,rgba(37,83,190,.75),rgba(63,83,190,.28));
+  border:1px solid rgba(160,190,255,.25);
+  box-shadow:0 20px 60px rgba(17,48,130,.2);
+}
+.hero:after {
+  content:"🎮";position:absolute;right:7%;top:50%;
+  transform:translateY(-50%) rotate(-13deg);
+  font-size:clamp(85px,15vw,170px);
+  opacity:.22;filter:drop-shadow(0 15px 20px #000);
+}
+.hero-content {position:relative;z-index:1;max-width:620px}
+.eyebrow {
+  color:#bcd3ff;font-size:12px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+}
+h1 {font-size:clamp(36px,6vw,62px);line-height:1.05;margin:15px 0}
+.hero p {color:#d4e1ff;line-height:1.7;max-width:470px}
+.primary-btn {
+  border:0;border-radius:13px;padding:14px 21px;
+  color:white;font-weight:750;
+  background:linear-gradient(135deg,#6197ff,#4056df);
+  box-shadow:0 7px 24px rgba(50,100,255,.35);
+  transition:.2s;
+}
+.primary-btn:hover {transform:translateY(-2px);filter:brightness(1.1)}
+.hero-actions {display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.secondary-btn {
+  border:1px solid rgba(255,255,255,.3);
+  background:rgba(255,255,255,.1);
+  padding:13px 18px;border-radius:13px;color:white;
+  font-weight:700;
+}
+.search-wrap {
+  margin:28px 0 22px;
+  display:flex;gap:12px;
+}
+.search-box {
+  display:flex;align-items:center;gap:12px;
+  flex:1;padding:0 17px;border-radius:16px;
+  min-width:0;
+}
+.search-box input {
+  background:transparent;border:0;outline:0;
+  color:var(--text);width:100%;padding:16px 0;
+  font-size:15px;
+}
+.search-box input::placeholder {color:var(--muted)}
+.section {margin-top:35px}
+.section-heading {
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:17px;
+}
+.section-heading h2 {font-size:21px;margin:0;letter-spacing:-.4px}
+.section-heading span {color:var(--muted);font-size:13px}
+.categories {
+  display:flex;gap:9px;overflow-x:auto;padding:2px 0 10px;
+  scrollbar-width:thin;
+}
+.chip {
+  white-space:nowrap;border:1px solid var(--border);
+  border-radius:30px;padding:10px 16px;
+  background:var(--surface);color:var(--muted);
+  font-size:13px;font-weight:700;transition:.2s;
+}
+.chip.active,.chip:hover {
+  background:linear-gradient(135deg,#477cff,#394fc5);
+  border-color:transparent;color:white;
+}
+.game-grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:17px;
+}
+.game-card {
+  min-width:0;border-radius:19px;overflow:hidden;
+  transition:transform .22s,border-color .22s;
+}
+.game-card:hover {transform:translateY(-5px);border-color:#6594ff88}
+.game-art {
+  height:135px;display:grid;place-items:center;
+  font-size:55px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--c1),var(--c2));
+}
+.game-art:before {
+  content:"";position:absolute;width:130px;height:130px;
+  border-radius:50%;border:1px solid #ffffff30;
+  right:-35px;top:-45px;
+}
+.game-art:after {
+  content:"";position:absolute;width:85px;height:85px;
+  border-radius:50%;border:1px solid #ffffff25;
+  left:-25px;bottom:-45px;
+}
+.game-art span {position:relative;z-index:1;filter:drop-shadow(0 5px 8px #0004)}
+.game-info {padding:13px}
+.game-name {font-size:15px;font-weight:800;margin-bottom:6px}
+.game-category {font-size:12px;color:var(--muted)}
+.game-bottom {
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:13px;gap:5px;
+}
+.status {
+  font-size:10px;font-weight:800;letter-spacing:.4px;
+  color:#a9c9ff;background:rgba(71,124,255,.16);
+  padding:6px 8px;border-radius:20px;
+}
+.favorite {
+  border:0;background:transparent;font-size:20px;
+  color:var(--muted);padding:2px 5px;
+}
+.favorite.saved {color:#ff719e}
+.empty {
+  grid-column:1/-1;text-align:center;padding:45px 15px;
+  color:var(--muted);border-radius:18px;
+}
+footer {
+  border-top:1px solid var(--border);
+  text-align:center;padding:28px 15px;color:var(--muted);
+  font-size:13px;
+}
+@media(max-width:850px) {
+  .game-grid {grid-template-columns:repeat(3,minmax(0,1fr))}
+  .nav-links {gap:12px}
+}
+@media(max-width:600px) {
+  header {padding:11px 4%}
+  .nav {gap:10px}
+  .logo {font-size:19px}
+  .logo-icon {width:35px;height:35px}
+  .nav-links {display:none}
+  main {padding:20px 4% 50px}
+  .hero {padding:29px 23px;min-height:270px}
+  .hero:after {right:4%;top:75%;font-size:90px}
+  .hero-content {max-width:90%}
+  .hero p {font-size:14px}
+  .search-wrap {margin:20px 0}
+  .game-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .game-art {height:115px;font-size:47px}
+  .game-info {padding:11px}
+  .game-name {font-size:14px}
+  .section {margin-top:28px}
+}
+</style>
 </head>
 <body>
-    <h1>GamesforU</h1>
-    <p>Your gaming destination is coming soon!</p>
+<header>
+  <div class="nav">
+    <div class="logo">
+      <div class="logo-icon">🎮</div>
+      GamesforU
+    </div>
+    <nav class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#games">Games</a>
+      <a href="#categories">Categories</a>
+      <a href="#favorites">Favorites</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">☀️</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="eyebrow">YOUR GAMING DESTINATION</div>
+      <h1>Play something<br>awesome.</h1>
+      <p>Discover new games, explore different worlds and find your next favorite game. All in one place.</p>
+      <div class="hero-actions">
+        <button class="primary-btn" onclick="document.querySelector('#games').scrollIntoView({behavior:'smooth'})">Explore games →</button>
+        <button class="secondary-btn" id="randomBtn">🎲 Surprise me</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="search-wrap">
+    <div class="search-box glass">
+      <span>🔍</span>
+      <input id="search" type="search" placeholder="Search games..." autocomplete="off">
+    </div>
+  </div>
+
+  <section class="section" id="categories">
+    <div class="section-heading">
+      <h2>Explore categories</h2>
+      <span>Find your kind of fun</span>
+    </div>
+    <div class="categories" id="categoryList"></div>
+  </section>
+
+  <section class="section" id="games">
+    <div class="section-heading">
+      <h2 id="listTitle">All games</h2>
+      <span id="gameCount">26 games</span>
+    </div>
+    <div class="game-grid" id="gameGrid"></div>
+  </section>
+
+  <section class="section" id="favorites">
+    <div class="section-heading">
+      <h2>❤️ Your favorites</h2>
+      <span>Saved on this device</span>
+    </div>
+    <div class="game-grid" id="favoriteGrid"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="logo" style="justify-content:center;margin-bottom:10px">
+    <div class="logo-icon">🎮</div> GamesforU
+  </div>
+  Your games. Your world. Your fun.
+  <br><br>© 2026 GamesforU
+</footer>
+
+<script>
+const games = [
+ {name:"2048",cat:"Puzzle",emoji:"🔢",colors:["#2866c9","#162e70"]},
+ {name:"Dino Game",cat:"Arcade",emoji:"🦖",colors:["#4b896c","#173e37"]},
+ {name:"Hextris",cat:"Puzzle",emoji:"⬡",colors:["#a34fd2","#42226e"]},
+ {name:"Fireboy and Watergirl",cat:"Platformer",emoji:"🔥",colors:["#e47736","#a52c54"]},
+ {name:"Pitch Duel",cat:"Sports",emoji:"⚽",colors:["#238d9a","#174d79"]},
+ {name:"Noname Soccer",cat:"Sports",emoji:"🥅",colors:["#398d55","#174b3b"]},
+ {name:"Momentum World Cup",cat:"Sports",emoji:"🏆",colors:["#416dd5","#27316e"]},
+ {name:"Basket Random",cat:"Sports",emoji:"🏀",colors:["#dc8138","#a33c26"]},
+ {name:"Soccer Random",cat:"Sports",emoji:"⚽",colors:["#329b65","#14543f"]},
+ {name:"Volley Random",cat:"Sports",emoji:"🏐",colors:["#4389cb","#284276"]},
+ {name:"Moto X3M",cat:"Racing",emoji:"🏍️",colors:["#d64c39","#722b50"]},
+ {name:"PolyTrack",cat:"Racing",emoji:"🏎️",colors:["#4776ce","#27356f"]},
+ {name:"Wordle",cat:"Puzzle",emoji:"🔤",colors:["#4c966a","#24553d"]},
+ {name:"Subway Surfers",cat:"Arcade",emoji:"🚆",colors:["#d35a9d","#653b9c"]},
+ {name:"Paper.io",cat:"Arcade",emoji:"🟦",colors:["#3b8fdb","#28428b"]},
+ {name:"Hole.io",cat:"Arcade",emoji:"🕳️",colors:["#454f9c","#171e4c"]},
+ {name:"Snake.io",cat:"Arcade",emoji:"🐍",colors:["#36a17c","#185d63"]},
+ {name:"Block Blast",cat:"Puzzle",emoji:"🧩",colors:["#477bda","#263b88"]},
+ {name:"Chess",cat:"Strategy",emoji:"♟️",colors:["#98744d","#4d382c"]},
+ {name:"Conquer the World",cat:"Strategy",emoji:"🌍",colors:["#368eaa","#204d80"]},
+ {name:"Jelly Fruit Merge",cat:"Puzzle",emoji:"🍉",colors:["#d65a8b","#853caa"]},
+ {name:"WeebPaint",cat:"Creative",emoji:"🎨",colors:["#a35fd3","#5541a3"]},
+ {name:"Down Golf",cat:"Sports",emoji:"⛳",colors:["#429c70","#1e5a4b"]},
+ {name:"Geometry Dash Clone",cat:"Platformer",emoji:"🟪",colors:["#9856d5","#452b8a"]},
+ {name:"Minecraft Clone",cat:"Adventure",emoji:"⛏️",colors:["#548c54","#254a3a"]},
+ {name:"Click-Speed Test",cat:"Casual",emoji:"⚡",colors:["#d39a36","#9d4c32"]}
+];
+
+const categories = ["All","Arcade","Racing","Platformer","Puzzle","Sports","Strategy","Adventure","Casual","Creative"];
+let activeCategory = "All";
+let favorites = JSON.parse(localStorage.getItem("gfu-favorites") || "[]");
+let searchTerm = "";
+
+const grid = document.getElementById("gameGrid");
+const favGrid = document.getElementById("favoriteGrid");
+
+function card(game) {
+ const saved = favorites.includes(game.name);
+ return `
+ <article class="game-card glass">
+   <div class="game-art" style="--c1:${game.colors[0]};--c2:${game.colors[1]}">
+     <span>${game.emoji}</span>
+   </div>
+   <div class="game-info">
+     <div class="game-name">${game.name}</div>
+     <div class="game-category">${game.cat}</div>
+     <div class="game-bottom">
+       <span class="status">COMING SOON</span>
+       <button class="favorite ${saved?"saved":""}" onclick="toggleFavorite('${game.name.replace(/'/g,"\\'")}')" aria-label="Favorite ${game.name}">${saved?"♥":"♡"}</button>
+     </div>
+   </div>
+ </article>`;
+}
+
+function renderCategories() {
+ document.getElementById("categoryList").innerHTML = categories.map(cat =>
+ `<button class="chip ${activeCategory===cat?"active":""}" onclick="chooseCategory('${cat}')">${cat}</button>`
+ ).join("");
+}
+
+function renderGames() {
+ const filtered = games.filter(g =>
+ (activeCategory==="All" || g.cat===activeCategory) &&
+ g.name.toLowerCase().includes(searchTerm)
+ );
+ grid.innerHTML = filtered.length
+ ? filtered.map(card).join("")
+ : `<div class="empty glass">No games found. Try another search!</div>`;
+ document.getElementById("gameCount").textContent = `${filtered.length} games`;
+ document.getElementById("listTitle").textContent = activeCategory==="All" ? "All games" : activeCategory+" games";
+}
+
+function renderFavorites() {
+ const list = games.filter(g=>favorites.includes(g.name));
+ favGrid.innerHTML = list.length
+ ? list.map(card).join("")
+ : `<div class="empty glass">Your favorite games will appear here. Tap ♡ on a game to save it!</div>`;
+}
+
+function chooseCategory(cat) {
+ activeCategory=cat;
+ renderCategories();
+ renderGames();
+ document.getElementById("games").scrollIntoView({behavior:"smooth"});
+}
+
+function toggleFavorite(name) {
+ favorites = favorites.includes(name)
+ ? favorites.filter(x=>x!==name)
+ : [...favorites,name];
+ localStorage.setItem("gfu-favorites",JSON.stringify(favorites));
+ renderGames();
+ renderFavorites();
+}
+
+document.getElementById("search").addEventListener("input",e=>{
+ searchTerm=e.target.value.toLowerCase().trim();
+ renderGames();
+});
+
+document.getElementById("randomBtn").addEventListener("click",()=>{
+ const available=games.filter(g=>
+ (activeCategory==="All"||g.cat===activeCategory) &&
+ g.name.toLowerCase().includes(searchTerm)
+ );
+ if(!available.length) return;
+ const chosen=available[Math.floor(Math.random()*available.length)];
+ const cards=[...grid.querySelectorAll(".game-card")];
+ const index=available.indexOf(chosen);
+ cards[index]?.scrollIntoView({behavior:"smooth",block:"center"});
+});
+
+document.getElementById("themeBtn").addEventListener("click",()=>{
+ document.body.classList.toggle("light");
+ const light=document.body.classList.contains("light");
+ document.getElementById("themeBtn").textContent=light?"🌙":"☀️";
+ localStorage.setItem("gfu-theme",light?"light":"dark");
+});
+
+if(localStorage.getItem("gfu-theme")==="light") {
+ document.body.classList.add("light");
+ document.getElementById("themeBtn").textContent="🌙";
+}
+
+renderCategories();
+renderGames();
+renderFavorites();
+</script>
 </body>
 </html>
